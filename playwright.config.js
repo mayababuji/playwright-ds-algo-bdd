@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 import { defineBddConfig } from 'playwright-bdd';
 import dotenv from 'dotenv';
 
@@ -9,6 +9,7 @@ const { BASE_URL } = process.env;
 if (!BASE_URL) {
   throw new Error('BASE_URL is missing from .env');
 }
+
 const testDir = defineBddConfig({
   features: 'features/**/*.feature',
   steps: [
@@ -20,9 +21,6 @@ const testDir = defineBddConfig({
 
 export default defineConfig({
   testDir,
-
-  timeout: 30 * 1000,
-  retries: process.env.CI ? 1 : 0,
 
   reporter: [
     ['list'],
@@ -36,7 +34,7 @@ export default defineConfig({
   ],
 
   use: {
-     baseURL: BASE_URL,
+    baseURL: BASE_URL,
     headless: false,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -47,7 +45,19 @@ export default defineConfig({
     {
       name: 'chromium',
       use: {
-        browserName: 'chromium'
+        ...devices['Desktop Chrome']
+      }
+    },
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox']
+      }
+    },
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari']
       }
     }
   ]
