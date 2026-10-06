@@ -1,9 +1,20 @@
 import { defineConfig } from '@playwright/test';
 import { defineBddConfig } from 'playwright-bdd';
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+const { BASE_URL } = process.env;
+
+if (!BASE_URL) {
+  throw new Error('BASE_URL is missing from .env');
+}
 const testDir = defineBddConfig({
   features: 'features/**/*.feature',
-  steps: 'steps/**/*.steps.js',
+  steps: [
+    'steps/**/*.steps.js',
+    'fixtures.js'
+  ],
   outputDir: 'tests/generated'
 });
 
@@ -25,8 +36,8 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL: 'https://dsportalapp.herokuapp.com',
-    headless: true,
+     baseURL: BASE_URL,
+    headless: false,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure'

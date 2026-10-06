@@ -2,16 +2,13 @@ export class LoginPage {
   constructor(page) {
     this.page = page;
 
-    this.usernameInput = page.getByLabel('Username');
-    this.passwordInput = page.getByLabel('Password');
+    this.usernameInput = page.getByRole('textbox',{name:'Username'});
+    this.passwordInput = page.getByRole('textbox',{name:'Password'});
+
     this.loginButton = page.getByRole('button', {
       name: /login/i
     });
-    this.dashboard = page.getByText('Dashboard');
-  }
-
-  async open() {
-    await this.page.goto('/login');
+    this.successMessage = page.getByText('You are logged in');
   }
 
   async enterUsername(username) {
@@ -25,8 +22,14 @@ export class LoginPage {
   async clickLogin() {
     await this.loginButton.click();
   }
+   async login(username, password) {
+//    const snapshot = await this.page.locator('body').ariaSnapshot();
 
-  async expectDashboardVisible() {
-    await this.dashboard.waitFor({ state: 'visible' });
+// console.log('\n===== BODY ARIA SNAPSHOT =====');
+// console.log(snapshot);
+// console.log('===== END BODY ARIA SNAPSHOT =====\n');
+    await this.usernameInput.fill(username);
+    await this.passwordInput.fill(password);
+    await this.loginButton.click();
   }
 }

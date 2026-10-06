@@ -8,3 +8,7 @@ node_modules/
 /playwright/.auth/
 allure-report/
 allure-results/
+# BDD-generated Playwright tests
+tests/generated/
+# Local environment variables
+.env

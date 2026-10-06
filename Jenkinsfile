@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         CI = 'true'
+        BASE_URL = 'https://dsportalapp.herokuapp.com'
         PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}/.playwright-browsers"
     }
 
@@ -50,11 +51,22 @@ pipeline {
 
         stage('Run all BDD tests') {
             steps {
-                catchError(
-                    buildResult: 'FAILURE',
-                    stageResult: 'FAILURE'
-                ) {
-                    sh 'npx playwright test --project=chromium'
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'ds-algo-login',
+                        usernameVariable: 'LOGIN_USERNAME',
+                        passwordVariable: 'LOGIN_PASSWORD'
+                    )
+                ]) {
+                    catchError(
+                        buildResult: 'FAILURE',
+                        stageResult: 'FAILURE'
+                    ) {
+                        sh '''
+                            set +x
+                            npx playwright test --project=chromium
+                        '''
+                    }
                 }
             }
         }
@@ -74,7 +86,7 @@ pipeline {
             }
 
             archiveArtifacts(
-                artifacts: 'playwright-report/**, test-results/**, allure-results/**',
+                artifacts: 'playwright-report/**,test-results/**,allure-results/**',
                 allowEmptyArchive: true,
                 fingerprint: true
             )
