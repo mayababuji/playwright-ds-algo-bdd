@@ -15,6 +15,7 @@ pipeline {
 
     environment {
         CI = 'true'
+         TEST_ENV = "${params.TEST_ENV}"
         PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}/.playwright-browsers"
     }
 
