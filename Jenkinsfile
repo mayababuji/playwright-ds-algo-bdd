@@ -37,9 +37,14 @@ pipeline {
             }
         }
 
-        stage('Install Playwright browser') {
+        stage('Install Playwright browsers') {
             steps {
-                sh 'npx playwright install --with-deps chromium'
+                sh '''
+                    npx playwright install --with-deps \
+                        chromium \
+                        firefox \
+                        webkit
+                '''
             }
         }
 
@@ -60,7 +65,7 @@ pipeline {
             }
         }
 
-        stage('Run all BDD tests') {
+        stage('Run all BDD tests on all browsers') {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -75,7 +80,7 @@ pipeline {
                     ) {
                         sh '''
                             set +x
-                            npx playwright test --project=chromium
+                            npx playwright test
                         '''
                     }
                 }
@@ -114,7 +119,7 @@ pipeline {
         }
 
         success {
-            echo 'All Playwright BDD tests passed.'
+            echo 'All Playwright BDD tests passed on Chromium, Firefox, and WebKit.'
         }
 
         failure {
