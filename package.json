@@ -1,19 +1,70 @@
 {
   "name": "playwright-bdd-ds-algo-project",
   "version": "1.0.0",
-  "description": "",
+  "description": "Playwright BDD automation framework for DS Algo",
   "main": "index.js",
-  "scripts": {},
-  "keywords": [],
+  "type": "module",
+  "scripts": {
+    "clean:reports": "rimraf allure-results allure-report playwright-report test-results tests/generated",
+    "bddgen": "bddgen",
+    "test:all": "npm run clean:reports && npm run bddgen && playwright test",
+
+    "test:local": "cross-env TEST_ENV=local npm run test:all",
+    "test:qa": "cross-env TEST_ENV=qa npm run test:all",
+    "test:prod": "cross-env TEST_ENV=prod npm run test:all",
+
+    "test:chromium": "npm run clean:reports && npm run bddgen && playwright test --project=chromium",
+    "test:firefox": "npm run clean:reports && npm run bddgen && playwright test --project=firefox",
+    "test:webkit": "npm run clean:reports && npm run bddgen && playwright test --project=webkit",
+
+    "test:local:chromium": "cross-env TEST_ENV=local npm run test:chromium",
+    "test:local:firefox": "cross-env TEST_ENV=local npm run test:firefox",
+    "test:local:webkit": "cross-env TEST_ENV=local npm run test:webkit",
+
+    "test:qa:chromium": "cross-env TEST_ENV=qa npm run test:chromium",
+    "test:qa:firefox": "cross-env TEST_ENV=qa npm run test:firefox",
+    "test:qa:webkit": "cross-env TEST_ENV=qa npm run test:webkit",
+
+    "test:prod:chromium": "cross-env TEST_ENV=prod npm run test:chromium",
+    "test:prod:firefox": "cross-env TEST_ENV=prod npm run test:firefox",
+    "test:prod:webkit": "cross-env TEST_ENV=prod npm run test:webkit",
+
+    "test:headed": "cross-env HEADLESS=false npm run test:all",
+    "test:local:headed": "cross-env TEST_ENV=local HEADLESS=false npm run test:all",
+    "test:qa:headed": "cross-env TEST_ENV=qa HEADLESS=false npm run test:all",
+
+    "test:debug": "npm run clean:reports && npm run bddgen && playwright test --debug",
+
+    "test:login": "npm run clean:reports && npm run bddgen && playwright test --grep \"@TestScenario_login_02\"",
+
+    "test:local:login": "cross-env TEST_ENV=local npm run test:login",
+    "test:qa:login": "cross-env TEST_ENV=qa npm run test:login",
+    "test:prod:login": "cross-env TEST_ENV=prod npm run test:login",
+
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "allure:serve": "allure serve allure-results",
+
+    "test:local:report": "cross-env TEST_ENV=local npm run test:all && npm run allure:generate && npm run allure:open",
+    "test:qa:report": "cross-env TEST_ENV=qa npm run test:all && npm run allure:generate && npm run allure:open",
+    "test:prod:report": "cross-env TEST_ENV=prod npm run test:all && npm run allure:generate && npm run allure:open"
+  },
+  "keywords": [
+    "playwright",
+    "bdd",
+    "automation",
+    "allure"
+  ],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.4",
     "allure-commandline": "^2.46.1",
     "allure-playwright": "^3.13.0",
+    "cross-env": "^10.1.0",
     "dotenv": "^18.0.5",
-    "playwright-bdd": "^9.2.1"
+    "playwright-bdd": "^9.2.1",
+    "rimraf": "^6.1.3"
   }
 }

@@ -1,23 +1,50 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(
+            name: 'TEST_ENV',
+            choices: ['local', 'qa', 'prod'],
+            description: 'Select the environment to test'
+        )
+    }
+
     tools {
         nodejs 'NodeJS-20'
     }
 
     environment {
         CI = 'true'
-        BASE_URL = 'https://dsportalapp.herokuapp.com'
         PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}/.playwright-browsers"
     }
 
     options {
         timestamps()
-        skipDefaultCheckout(false)
         disableConcurrentBuilds()
     }
 
     stages {
+        stage('Set environment') {
+            steps {
+                script {
+                    def urls = [
+                        local: 'https://dsportalapp.herokuapp.com',
+                        qa: 'https://dsportalapp.herokuapp.com',
+                        prod: 'https://dsportalapp.herokuapp.com'
+                    ]
+
+                    if (!urls.containsKey(params.TEST_ENV)) {
+                        error("Unsupported TEST_ENV: ${params.TEST_ENV}")
+                    }
+
+                    env.BASE_URL = urls[params.TEST_ENV]
+                }
+
+                echo "Running tests against environment: ${params.TEST_ENV}"
+                echo "Base URL: ${env.BASE_URL}"
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -28,6 +55,8 @@ pipeline {
             steps {
                 sh 'node --version'
                 sh 'npm --version'
+                sh 'echo TEST_ENV=$TEST_ENV'
+                sh 'echo BASE_URL=$BASE_URL'
             }
         }
 
@@ -74,15 +103,10 @@ pipeline {
                         passwordVariable: 'LOGIN_PASSWORD'
                     )
                 ]) {
-                    catchError(
-                        buildResult: 'FAILURE',
-                        stageResult: 'FAILURE'
-                    ) {
-                        sh '''
-                            set +x
-                            npx playwright test
-                        '''
-                    }
+                    sh '''
+                        set +x
+                        npx playwright test
+                    '''
                 }
             }
         }
@@ -119,11 +143,11 @@ pipeline {
         }
 
         success {
-            echo 'All Playwright BDD tests passed on Chromium, Firefox, and WebKit.'
+            echo "All Playwright BDD tests passed in ${params.TEST_ENV}."
         }
 
         failure {
-            echo 'One or more Playwright BDD tests failed.'
+            echo "One or more Playwright BDD tests failed in ${params.TEST_ENV}."
         }
 
         cleanup {
