@@ -45,7 +45,18 @@ pipeline {
 
         stage('Generate BDD tests') {
             steps {
-                sh 'npx bddgen'
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'ds-algo-login',
+                        usernameVariable: 'LOGIN_USERNAME',
+                        passwordVariable: 'LOGIN_PASSWORD'
+                    )
+                ]) {
+                    sh '''
+                        set +x
+                        npx bddgen
+                    '''
+                }
             }
         }
 
